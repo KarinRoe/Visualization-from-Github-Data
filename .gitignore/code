@@ -1,0 +1,28 @@
+# got State of IOWA Salary Book at  https://catalog.data.gov/dataset/state-of-iowa-salary-book
+# Salary from state employee from the year 2007 to 2017
+
+library(ggplot2)
+
+data<- read.csv("State_of_Iowa_Salary_Book.csv")
+
+summary(data)
+data_female<- subset(data, data$Gender == "F")
+data_male <-subset(data, data$Gender == "M") 
+data_f_m <- rbind(data_female, data_male)
+
+
+summary(as.numeric(data_f_m$Total.Salary.Paid))
+x <- data.frame(data_f_m$Fiscal.Year, data_f_m$Total.Salary.Paid, data_f_m$Gender, )
+#rename colnames
+colnames(x) <- c("Year", "Salary", "Gender")
+#take out the dollar sign in Total salary
+x$Salary <- as.numeric(sub("\\$","", x$Salary))
+#make year a factor
+x$Year <- as.factor(x$Year)
+# remove NA, 0 and minus values from Salary
+x <-x[!(is.na(x$Salary) | x$Salary <= 0), ]
+
+plot<- ggplot(data = x,
+              aes(x = factor(Year), y = Salary, fill= Gender)) + 
+  geom_bar(stat = "identity", position="dodge") +
+  labs(x = "Year", y = "Salary")
