@@ -1,0 +1,29 @@
+data<- read.csv("survey_data.csv", header = T, na.strings="")
+
+
+require(ggplot2)
+require(plyr)
+
+x <- data.frame(data$RESPONSE.ID, data$GENDER, data$PROVIDED.HELP,  data$RECEIVED.HELP)
+colnames(x) <- c("ID", "Gender", "Gave.Help", "Got.Help")
+summary(x)
+x<- na.omit(x)
+
+#ordering levels and changing levels names
+x$Gender <- factor(x$Gender, levels = c("Man", "Woman", "Non-binary  or Other", "Prefer not to say" ))
+
+
+######### unwelcoming language
+# first make a dataframe with frequencies
+df <- as.data.frame(with(x, table(Gave.Help,Got.Help,Gender)))
+
+# next: compute percentages per group
+df <- ddply(df, .(Gender), transform, p = Freq/sum(Freq))
+df$Help<- c("Neither","Helped","Received", "Both","Neither","Helped","Received", "Both","Neither","Helped","Received", "Both","Neither","Helped","Received", "Both" )
+df$Help <- factor(df$Help, levels = c("Helped", "Received", "Both", "Neither" ))
+
+# and plot
+ggplot(df, aes(Help, p, fill= Help))+
+  facet_grid(~Gender)+
+  geom_bar(stat="identity")+
+  theme(axis.text.x=element_blank(), axis.ticks=element_blank())
