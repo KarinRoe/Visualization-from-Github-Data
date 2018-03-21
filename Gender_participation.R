@@ -13,7 +13,6 @@ x$Gender <- factor(x$Gender, levels = c("Man", "Woman", "Non-binary  or Other", 
 df2<-as.data.frame(with(x, table( Gender)))
 df2$p<-  df2$Freq/sum(df2$Freq)
 
-df2
 ggplot(df2, aes(Gender, Freq))+
   geom_bar(stat="identity")
 
